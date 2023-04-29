@@ -1,0 +1,230 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+*, :before, :after {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+:focus {
+  outline: 0;
+}
+
+::-webkit-input-placeholder {
+  text-indent: 0px;
+  -webkit-transition: text-indent 0.3s ease;
+  transition: text-indent 0.3s ease;
+  font-family: inherit;
+  color: #949494 !important;
+}
+
+::-moz-placeholder {
+  opacity: 1;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  font-family: inherit;
+  color: #949494 !important;
+}
+
+:-moz-placeholder {
+  opacity: 1;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  font-family: inherit;
+  color: #949494 !important;
+}
+
+:-ms-input-placeholder {
+  text-indent: 0px;
+  -webkit-transition: text-indent 0.3s ease;
+  transition: text-indent 0.3s ease;
+  font-family: inherit;
+  color: #949494 !important;
+}
+
+:focus::-webkit-input-placeholder {
+  text-indent: -1000px;
+  -webkit-transition: text-indent 0.3s ease;
+  transition: text-indent 0.3s ease;
+}
+
+:focus::-moz-placeholder {
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+
+:focus:-moz-placeholder {
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+
+:focus:-ms-input-placeholder {
+  text-indent: -1000px;
+  -webkit-transition: text-indent 0.3s ease;
+  transition: text-indent 0.3s ease;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+label, input:not([type="checkbox"]),
+input:not([type="radio"]), button {
+  -webkit-appearance: none;
+  font-family: inherit;
+}
+
+label, input[type="submit"], button {
+  cursor: pointer;
+}
+
+img {
+  border: none;
+}
+
+html, body {
+  height: 100%;
+}
+
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
+}
+
+button:focus {
+  outline: none !important;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input:hover::-webkit-outer-spin-button,
+input:hover::-webkit-inner-spin-button {
+  display: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+body {
+  font: 400 1.8rem/2.4rem 'Roboto', sans-serif;
+  color: #000;
+  background: #f0f0f0;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  width: 110rem;
+}
+
+.info {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  margin: 20px 0;
+  font-size: 3rem;
+}
+
+p {
+  margin-bottom: 0.5rem;
+}
+
+.text-field {
+  min-height: 20rem;
+  width: 100%;
+  font-size: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  resize: vertical;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
+.text-field:focus {
+  border-color: black;
+}
+
+.keyboard {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  gap: 0.6rem;
+  border-radius: 10px;
+  border: 1px solid #aaa;
+  -webkit-box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3), 5px 5px 0 rgba(0, 0, 0, 0.5);
+          box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3), 5px 5px 0 rgba(0, 0, 0, 0.5);
+  background: #fff;
+  padding: 1.5rem 1.5rem 1rem;
+  margin-bottom: 50px;
+}
+
+.key-item {
+  margin-bottom: 0.6rem;
+  border-radius: 3px;
+  background: #eeebeb;
+  width: 6rem;
+  height: 6rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+          box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.5);
+  -webkit-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+  cursor: pointer;
+}
+
+.key-item_service {
+  background: #ccc;
+}
+
+.key-item:hover {
+  background: #aaa;
+}
+
+.key-item_pres, .key-item:active {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  background: #aaa;
+}
+
+.Tab, .Delete {
+  width: 8rem;
+}
+
+.CapsLock {
+  width: 10rem;
+}
+
+.ShiftLeft, .ShiftRight, .Enter, .Backspace {
+  width: 12.1rem;
+}
+
+.Space {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
