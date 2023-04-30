@@ -291,13 +291,13 @@ const keyboardData = [
         class: "key-item_service"
     },
     {
-        key: "Alt",
-        code: "AltLeft",
+        key: "⊞",
+        code: "MetaLeft",
         class: "key-item_service"
     },
     {
-        key: "⊞",
-        code: "MetaLeft",
+        key: "Alt",
+        code: "AltLeft",
         class: "key-item_service"
     },
     {
@@ -338,54 +338,94 @@ function CreateKey(obj){
     let keyItem = document.createElement("div");
     let keyClass = "";
     if(obj.class){
-        keyClass = obj.class + " ";
+        keyClass =  " " + obj.class;
     }
-    keyItem.className = "key-item " + keyClass + obj.code;
+    keyItem.className = obj.code + " key-item" + keyClass;
 
-    let key = document.createElement("div");
-    key.className = "key";
+    let key = document.createElement("span");
+    key.className = "key_active key";
     key.textContent = obj.key;
-
     keyItem.append(key);
+
+    if(obj.keyRu){
+        let keyRu = document.createElement("span");
+        keyRu.className = "key key-ru";
+        keyRu.textContent = obj.keyRu;
+        keyItem.append(keyRu);
+    }
+
+    if(obj.keyAlter){
+        let keyAlter = document.createElement("span");
+        keyAlter.className = "key key-alter";
+        keyAlter.textContent = obj.keyAlter;
+        keyItem.append(keyAlter);
+    }
+
+    if(obj.keyRuAlter){
+        let keyRuAlter= document.createElement("span");
+        keyRuAlter.className = "key key-ru-alter";
+        keyRuAlter.textContent = obj.keyRuAlter;
+        keyItem.append(keyRuAlter);
+    }
 
     return keyItem
 }
 
+let container = document.createElement("div");
+container.className = "container";
+
+let info = document.createElement("div");
+info.className = "info";
+info.insertAdjacentHTML("afterbegin", "<h1 class=\"title\">RSS Virtual Keyboard</h1><p>Клавиатура создана в операционной системе Windows</p><p>Для переключения языка комбинация: левыe Shift + Alt</p>");
+
 let textField = document.createElement("textarea");
+textField.className = "text-field";
+
+
+
+let keyboard = document.createElement("div");
+keyboard.className = "keyboard";
+
+container.append(info);
+container.append(textField);
+container.append(keyboard);
+body.append(container);
 
 function generateContent(){
-    let container = document.createElement("div");
-    container.className = "container";
-
-    let info = document.createElement("div");
-    info.className = "info";
-    info.insertAdjacentHTML("afterbegin", "<h1 class=\"title\">RSS Virtual Keyboard</h1><p>Клавиатура создана в операционной системе Windows</p><p>Для переключения языка комбинация: левыe Shift + Alt</p>");
-
-    textField.className = "text-field";
-
-
-
-    let keyboard = document.createElement("div");
-    keyboard.className = "keyboard";
-
-    container.append(info);
-    container.append(textField);
-    container.append(keyboard);
-    body.append(container);
-
     for(let i = 0; i < keyboardData.length; i++){
         keyboard.append(CreateKey(keyboardData[i]));
     }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    generateContent()
+    generateContent();
+    let shiftLeft = document.querySelector(".ShiftLeft");
+    shiftLeft.addEventListener("mousedown", () => {
+        document.dispatchEvent(new KeyboardEvent("keydown", {
+            key: 'Shift',
+            keyCode: 16,
+            which: 16,
+            shiftKey: true,
+        }));
+
+        keyboard.classList.add("upper-active")
+    });
+
+    shiftLeft.addEventListener("mouseup", () => {
+        document.dispatchEvent(new KeyboardEvent("keyup", {
+          key: 'Shift',
+          keyCode: 16,
+          which: 16,
+          shiftKey: false,
+        }))
+
+        keyboard.classList.remove("upper-active")
+      });
 })
 
 body.addEventListener("keydown", (e) => {
     let code = "." + e.code;
     let key_pres = document.querySelector(code);
-    console.log(key_pres);
     key_pres.classList.add("key-item_pres");
     textField.focus();
 });
@@ -393,3 +433,17 @@ body.addEventListener("keydown", (e) => {
 body.addEventListener("keyup", (e) => {
     document.querySelector(".key-item_pres").classList.remove("key-item_pres")
 });
+
+keyboard.addEventListener("click", (e) => {
+    if(e.target !== keyboard){
+        let sumbol = e.target.textContent;
+        if(sumbol.length == 1){
+            if(e.shiftKey){
+                textField.value += sumbol.toUpperCase();
+            } else{
+                textField.value += sumbol;
+            }
+        }
+    }
+})
+
