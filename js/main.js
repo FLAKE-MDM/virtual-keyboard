@@ -147,7 +147,7 @@ const keyboardData = [
     {
         key: "Delete",
         code: "Delete",
-        class: "key-item_service"
+        class: "key-item_service",
     },
     {
         key: "CapsLock",
@@ -332,44 +332,10 @@ const keyboardData = [
     }
 ]
 
+
+
 const body = document.querySelector("body");
-
-function CreateKey(obj){
-    let keyItem = document.createElement("div");
-    let keyClass = "";
-    if(obj.class){
-        keyClass =  " " + obj.class;
-    }
-    keyItem.className = obj.code + " key-item" + keyClass;
-
-    let key = document.createElement("span");
-    key.className = "key_active key";
-    key.textContent = obj.key;
-    keyItem.append(key);
-
-    if(obj.keyRu){
-        let keyRu = document.createElement("span");
-        keyRu.className = "key key-ru";
-        keyRu.textContent = obj.keyRu;
-        keyItem.append(keyRu);
-    }
-
-    if(obj.keyAlter){
-        let keyAlter = document.createElement("span");
-        keyAlter.className = "key key-alter";
-        keyAlter.textContent = obj.keyAlter;
-        keyItem.append(keyAlter);
-    }
-
-    if(obj.keyRuAlter){
-        let keyRuAlter= document.createElement("span");
-        keyRuAlter.className = "key key-ru-alter";
-        keyRuAlter.textContent = obj.keyRuAlter;
-        keyItem.append(keyRuAlter);
-    }
-
-    return keyItem
-}
+const keyArr = [];
 
 let container = document.createElement("div");
 container.className = "container";
@@ -381,8 +347,6 @@ info.insertAdjacentHTML("afterbegin", "<h1 class=\"title\">RSS Virtual Keyboard<
 let textField = document.createElement("textarea");
 textField.className = "text-field";
 
-
-
 let keyboard = document.createElement("div");
 keyboard.className = "keyboard";
 
@@ -391,59 +355,143 @@ container.append(textField);
 container.append(keyboard);
 body.append(container);
 
-function generateContent(){
-    for(let i = 0; i < keyboardData.length; i++){
-        keyboard.append(CreateKey(keyboardData[i]));
+class Key{
+    constructor(obj, lang = "en", caps = "false", shift = "false"){
+        this.lang = lang;
+        this.caps = caps;
+        this.shift = shift;
+        this.key = obj.key;
+        this.keyAlter = obj.keyAlter;
+        this.keyRu = obj.keyRu;
+        this.keyRuAlter = obj.keyRuAlter;
+        this.code = obj.code;
+        this.class = String(obj.class) != "undefined" ? obj.code + " key-item " + obj.class : obj.code + " key-item";
+    }
+
+    render(){
+        let current = this.key;
+
+        if(this.lang == "ru" && this.keyRu){
+            current = this.keyRu;
+            if(this.caps == "true" && this.key.length == 1){
+                current = (this.keyRu).toUpperCase()
+            }
+            if(this.shift == "true" && this.key.length == 1){
+                current = typeof this.keyRuAlter != "undefined" ? this.keyRuAlter : (this.keyRu).toUpperCase();
+            }
+        } else{
+            if(this.caps == "true" && this.key.length == 1){
+                current = (this.key).toUpperCase();
+            }
+            if(this.shift == "true" && this.key.length == 1){
+                current = typeof this.keyAlter != "undefined" ? this.keyAlter : (this.key).toUpperCase();
+            }
+        }
+
+        let keyItem = document.createElement("div");
+        keyItem.className = this.class;
+        keyItem.textContent = current;
+
+        keyboard.append(keyItem);
+
+        keyItem.addEventListener("mousedown", (e) => {
+            let currentValue = current;
+            textField.focus();
+            if(this.code == "ShiftLeft" || this.code == "ShiftRight"){
+                keyboard.innerHTML = "";
+                for(let i = 0; i < keyArr.length; i++){
+                    keyArr[i].setValue("shift", "true");
+                    keyArr[i].render();
+                }
+            }
+            if(this.code == "CapsLock"){
+                keyboard.innerHTML = "";
+                let caps = keyArr[0].caps;
+                console.log(Boolean(caps));
+                for(let i = 0; i < keyArr.length; i++){
+                    caps === "true" ? keyArr[i].setValue("caps", "false") : keyArr[i].setValue("caps", "true");
+                    keyArr[i].render();
+                }
+            }
+            if(currentValue.length == 1 && this.code != "MetaLeft"){
+                textField.value += currentValue;
+            }
+
+        });
+
+        keyItem.addEventListener("mouseup", () =>{
+            let currentValue = this.key;
+            keyboard.innerHTML = "";
+            for(let i = 0; i < keyArr.length; i++){
+                keyArr[i].setValue("shift", "false");
+                keyArr[i].render();
+            }
+        })
+
+    }
+
+    setValue(name, val){
+        this[name] = val
     }
 }
 
+
+function generateContent(){
+    for(let i = 0; i < keyboardData.length; i++){
+        let current = new Key(keyboardData[i]);
+        current.render();
+        keyArr.push(current)
+    }
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
     generateContent();
-    let shiftLeft = document.querySelector(".ShiftLeft");
-    shiftLeft.addEventListener("mousedown", () => {
-        document.dispatchEvent(new KeyboardEvent("keydown", {
-            key: 'Shift',
-            keyCode: 16,
-            which: 16,
-            shiftKey: true,
-        }));
+    textField.focus();
 
-        keyboard.classList.add("upper-active")
-    });
+    // let shiftLeft = document.querySelector(".ShiftLeft");
+    // let shiftRight = document.querySelector(".ShiftRight");
+    // shiftLeft.addEventListener("mousedown", () => {
+    //     Key.shift = true;
+    //     keyboard.classList.add("upper-active")
+    // });
 
-    shiftLeft.addEventListener("mouseup", () => {
-        document.dispatchEvent(new KeyboardEvent("keyup", {
-          key: 'Shift',
-          keyCode: 16,
-          which: 16,
-          shiftKey: false,
-        }))
+    // shiftLeft.addEventListener("mouseup", () => {
+    //     Key.shift = false;
+    //     keyboard.classList.remove("upper-active")
+    // });
 
-        keyboard.classList.remove("upper-active")
-      });
 })
 
 body.addEventListener("keydown", (e) => {
+    textField.focus();
     let code = "." + e.code;
     let key_pres = document.querySelector(code);
     key_pres.classList.add("key-item_pres");
-    textField.focus();
+
+    // if(e.code == "ShiftLeft" || e.code == "ShiftRight"){
+    //     Key.shift = true;
+    //     keyboard.classList.add("upper-active")
+    // }
+
 });
 
 body.addEventListener("keyup", (e) => {
-    document.querySelector(".key-item_pres").classList.remove("key-item_pres")
+    document.querySelector(".key-item_pres").classList.remove("key-item_pres");
+    // Key.pro.shift = false;
+    // keyboard.classList.remove("upper-active")
 });
 
-keyboard.addEventListener("click", (e) => {
-    if(e.target !== keyboard){
-        let sumbol = e.target.textContent;
-        if(sumbol.length == 1){
-            if(e.shiftKey){
-                textField.value += sumbol.toUpperCase();
-            } else{
-                textField.value += sumbol;
-            }
-        }
-    }
-})
+// keyboard.addEventListener("click", (e) => {
+//     if(e.target !== keyboard){
+//         let sumbol = e.target.textContent;
+//         if(sumbol.length == 1){
+//             if(e.shiftKey){
+//                 textField.value += sumbol.toUpperCase();
+//             } else{
+//                 textField.value += sumbol;
+//             }
+//         }
+//     }
+// })
 
