@@ -442,7 +442,20 @@ class Key{
             } else if(this.code == "Backspace"){
                 textField.value = value.substring(0, caretPos - 1) + value.substring(caretPos);
                 textField.selectionStart = textField.selectionEnd = caretPos - 1;
-            } else if(currentValue.length == 1 && this.code != "MetaLeft"){
+            } else if(this.code == "ControlLeft"){
+                keyItem.classList.add("key-item_pres");
+                keyItem.setAttribute("data-pres", "true");
+            } else if(this.code == "AltLeft"){
+                if(document.querySelector(".ControlLeft").getAttribute("data-pres")){
+                    keyboard.innerHTML = "";
+                    lang == "en" ? lang = "ru" : lang = "en";
+                    for(let i = 0; i < keyArr.length; i++){
+                        keyArr[i].setValue("lang", lang)
+                        keyArr[i].render();
+                    }
+                    localStorage.setItem("lang", lang)
+                }
+            }  else if(currentValue.length == 1 && this.code != "MetaLeft"){
                 textField.value = value.substring(0, caretPos) + currentValue + value.substring(textField.selectionEnd);
                 if (this.code == "ArrowDown" || this.code == "ArrowUp" || this.code == "ArrowLeft" || this.code == "ArrowRight") {
                     textField.selectionStart = textField.selectionEnd = caretPos + 1;
