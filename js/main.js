@@ -337,6 +337,7 @@ const keyboardData = [
 const body = document.querySelector("body");
 const keyArr = [];
 let lang = localStorage.getItem("lang") ? localStorage.getItem("lang") : "en";
+let keyPres = false;
 
 let container = document.createElement("div");
 container.className = "container";
@@ -405,6 +406,8 @@ class Key{
 
         keyItem.addEventListener("mousedown", (e) => {
             let currentValue = current;
+            let caretPos = textField.selectionStart;
+            let value = textField.value;
 
             if(this.code == "ShiftLeft" || this.code == "ShiftRight"){
                 keyboard.innerHTML = "";
@@ -413,62 +416,43 @@ class Key{
                     val === "true" ? keyArr[i].setValue("shift", "false") : keyArr[i].setValue("shift", "true");
                     keyArr[i].render();
                 }
-            }
-            if(this.code == "CapsLock"){
+            } else if(this.code == "CapsLock"){
                 keyboard.innerHTML = "";
                 let val = keyArr[0].caps;
                 for(let i = 0; i < keyArr.length; i++){
                     val === "true" ? keyArr[i].setValue("caps", "false") : keyArr[i].setValue("caps", "true");
                     keyArr[i].render();
                 }
-            }
-            if(this.code == "Tab"){
-                let caretPos = textField.selectionStart;
-                let value = textField.value;
+                let event = new KeyboardEvent("keydown", {
+                    key: "CapsLock",
+                    keyCode: 20,
+                    which: 20,
+                    code: "CapsLock"
+                  });
+                  textField.dispatchEvent(event);
+            } else if(this.code == "Tab"){
                 textField.value = value.substring(0, caretPos) + "\t" + value.substring(textField.selectionEnd);
                 textField.selectionStart = textField.selectionEnd = caretPos + 1;
-            }
-            if(this.code == "Enter"){
-                let caretPos = textField.selectionStart;
-                let value = textField.value;
+            } else if(this.code == "Enter"){
                 textField.value = value.substring(0, caretPos) + "\n" + value.substring(textField.selectionEnd);
                 textField.selectionStart = textField.selectionEnd = caretPos + 1;
-            }
-            if(this.code == "Delete"){
-                let caretPos = textField.selectionStart;
-                let value = textField.value;
+            } else if(this.code == "Delete"){
                 textField.value = value.substring(0, caretPos) + value.substring(caretPos + 1);
                 textField.selectionStart = textField.selectionEnd = caretPos;
-            }
-            if(this.code == "Backspace"){
-                let caretPos = textField.selectionStart;
-                let value = textField.value;
+            } else if(this.code == "Backspace"){
                 textField.value = value.substring(0, caretPos - 1) + value.substring(caretPos);
                 textField.selectionStart = textField.selectionEnd = caretPos - 1;
-            }
-            if(currentValue.length == 1 && this.code != "MetaLeft"){
-                let caretPos = textField.selectionStart;
-                let value = textField.value;
+            } else if(currentValue.length == 1 && this.code != "MetaLeft"){
                 textField.value = value.substring(0, caretPos) + currentValue + value.substring(textField.selectionEnd);
                 if (this.code == "ArrowDown" || this.code == "ArrowUp" || this.code == "ArrowLeft" || this.code == "ArrowRight") {
                     textField.selectionStart = textField.selectionEnd = caretPos + 1;
                 } else{
-                    textField.selectionStart = textField.selectionEnd = caretPos - 1;
+                    textField.selectionStart = caretPos + 1;
+                    textField.selectionEnd = textField.selectionStart;
                 }
             }
 
-
         });
-
-        keyItem.addEventListener("mouseup", () =>{
-            let currentValue = this.key;
-
-            // keyboard.innerHTML = "";
-            // for(let i = 0; i < keyArr.length; i++){
-            //     keyArr[i].setValue("shift", "false");
-            //     keyArr[i].render();
-            // }
-        })
 
     }
 
@@ -491,19 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
     generateContent();
     textField.focus();
 
-    // let shiftLeft = document.querySelector(".ShiftLeft");
-    // let shiftRight = document.querySelector(".ShiftRight");
-    // shiftLeft.addEventListener("mousedown", () => {
-    //     Key.shift = true;
-    //     keyboard.classList.add("upper-active")
-    // });
-
-    // shiftLeft.addEventListener("mouseup", () => {
-    //     Key.shift = false;
-    //     keyboard.classList.remove("upper-active")
-    // });
-
-})
+});
 
 body.addEventListener("keydown", (e) => {
     textField.focus();
@@ -521,7 +493,8 @@ body.addEventListener("keydown", (e) => {
         }
         localStorage.setItem("lang", lang)
     }
-    if(e.code == "ShiftLeft" || e.code == "ShiftRight"){
+    if(e.code == "ShiftLeft" && !keyPres || e.code == "ShiftRight" && !keyPres){
+        keyPres = true;
         keyboard.innerHTML = "";
         let val = keyArr[0].shift;
         for(let i = 0; i < keyArr.length; i++){
@@ -546,13 +519,6 @@ body.addEventListener("keydown", (e) => {
     }
 
 
-
-
-    // if(e.code == "ShiftLeft" || e.code == "ShiftRight"){
-    //     Key.shift = true;
-    //     keyboard.classList.add("upper-active")
-    // }
-
 });
 
 body.addEventListener("keyup", (e) => {
@@ -560,21 +526,10 @@ body.addEventListener("keyup", (e) => {
     if(key_pres){
         key_pres.classList.remove("key-item_pres");
     }
+    if(e.code == "ShiftLeft" || e.code == "ShiftRight"){
+        keyPres = false;
+    }
 
-    // Key.pro.shift = false;
-    // keyboard.classList.remove("upper-active")
 });
 
-// keyboard.addEventListener("click", (e) => {
-//     if(e.target !== keyboard){
-//         let sumbol = e.target.textContent;
-//         if(sumbol.length == 1){
-//             if(e.shiftKey){
-//                 textField.value += sumbol.toUpperCase();
-//             } else{
-//                 textField.value += sumbol;
-//             }
-//         }
-//     }
-// })
 
