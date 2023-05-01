@@ -175,10 +175,6 @@ p {
   margin-bottom: 50px;
 }
 
-.keyboard.shift-active {
-  text-transform: uppercase;
-}
-
 .key-item {
   margin-bottom: 0.6rem;
   border-radius: 3px;

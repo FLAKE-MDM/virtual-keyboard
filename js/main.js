@@ -336,13 +336,14 @@ const keyboardData = [
 
 const body = document.querySelector("body");
 const keyArr = [];
+let lang = localStorage.getItem("lang") ? localStorage.getItem("lang") : "en";
 
 let container = document.createElement("div");
 container.className = "container";
 
 let info = document.createElement("div");
 info.className = "info";
-info.insertAdjacentHTML("afterbegin", "<h1 class=\"title\">RSS Virtual Keyboard</h1><p>Клавиатура создана в операционной системе Windows</p><p>Для переключения языка комбинация: левыe Shift + Alt</p>");
+info.insertAdjacentHTML("afterbegin", "<h1 class=\"title\">RSS Virtual Keyboard</h1><p>Клавиатура создана в операционной системе Windows</p><p>Для переключения языка комбинация: левыe Ctrl + Alt</p>");
 
 let textField = document.createElement("textarea");
 textField.className = "text-field";
@@ -369,6 +370,8 @@ class Key{
     }
 
     render(){
+        let keyItem = document.createElement("div");
+        let currenClass = this.class;
         let current = this.key;
 
         if(this.lang == "ru" && this.keyRu){
@@ -387,45 +390,84 @@ class Key{
                 current = typeof this.keyAlter != "undefined" ? this.keyAlter : (this.key).toUpperCase();
             }
         }
+        if(this.caps == "true" && this.code === "CapsLock"){
+            currenClass += " key-item_pres"
+        }
+        if(this.shift == "true" && this.code == "ShiftLeft" || this.shift == "true" && this.code == "ShiftRight"){
+            currenClass += " key-item_pres"
+        }
 
-        let keyItem = document.createElement("div");
-        keyItem.className = this.class;
+
+        keyItem.className = currenClass;
         keyItem.textContent = current;
 
         keyboard.append(keyItem);
 
         keyItem.addEventListener("mousedown", (e) => {
             let currentValue = current;
-            textField.focus();
+
             if(this.code == "ShiftLeft" || this.code == "ShiftRight"){
                 keyboard.innerHTML = "";
+                let val = keyArr[0].shift;
                 for(let i = 0; i < keyArr.length; i++){
-                    keyArr[i].setValue("shift", "true");
+                    val === "true" ? keyArr[i].setValue("shift", "false") : keyArr[i].setValue("shift", "true");
                     keyArr[i].render();
                 }
             }
             if(this.code == "CapsLock"){
                 keyboard.innerHTML = "";
-                let caps = keyArr[0].caps;
-                console.log(Boolean(caps));
+                let val = keyArr[0].caps;
                 for(let i = 0; i < keyArr.length; i++){
-                    caps === "true" ? keyArr[i].setValue("caps", "false") : keyArr[i].setValue("caps", "true");
+                    val === "true" ? keyArr[i].setValue("caps", "false") : keyArr[i].setValue("caps", "true");
                     keyArr[i].render();
                 }
             }
-            if(currentValue.length == 1 && this.code != "MetaLeft"){
-                textField.value += currentValue;
+            if(this.code == "Tab"){
+                let caretPos = textField.selectionStart;
+                let value = textField.value;
+                textField.value = value.substring(0, caretPos) + "\t" + value.substring(textField.selectionEnd);
+                textField.selectionStart = textField.selectionEnd = caretPos + 1;
             }
+            if(this.code == "Enter"){
+                let caretPos = textField.selectionStart;
+                let value = textField.value;
+                textField.value = value.substring(0, caretPos) + "\n" + value.substring(textField.selectionEnd);
+                textField.selectionStart = textField.selectionEnd = caretPos + 1;
+            }
+            if(this.code == "Delete"){
+                let caretPos = textField.selectionStart;
+                let value = textField.value;
+                textField.value = value.substring(0, caretPos) + value.substring(caretPos + 1);
+                textField.selectionStart = textField.selectionEnd = caretPos;
+            }
+            if(this.code == "Backspace"){
+                let caretPos = textField.selectionStart;
+                let value = textField.value;
+                textField.value = value.substring(0, caretPos - 1) + value.substring(caretPos);
+                textField.selectionStart = textField.selectionEnd = caretPos - 1;
+            }
+            if(currentValue.length == 1 && this.code != "MetaLeft"){
+                let caretPos = textField.selectionStart;
+                let value = textField.value;
+                textField.value = value.substring(0, caretPos) + currentValue + value.substring(textField.selectionEnd);
+                if (this.code == "ArrowDown" || this.code == "ArrowUp" || this.code == "ArrowLeft" || this.code == "ArrowRight") {
+                    textField.selectionStart = textField.selectionEnd = caretPos + 1;
+                } else{
+                    textField.selectionStart = textField.selectionEnd = caretPos - 1;
+                }
+            }
+
 
         });
 
         keyItem.addEventListener("mouseup", () =>{
             let currentValue = this.key;
-            keyboard.innerHTML = "";
-            for(let i = 0; i < keyArr.length; i++){
-                keyArr[i].setValue("shift", "false");
-                keyArr[i].render();
-            }
+
+            // keyboard.innerHTML = "";
+            // for(let i = 0; i < keyArr.length; i++){
+            //     keyArr[i].setValue("shift", "false");
+            //     keyArr[i].render();
+            // }
         })
 
     }
@@ -438,7 +480,7 @@ class Key{
 
 function generateContent(){
     for(let i = 0; i < keyboardData.length; i++){
-        let current = new Key(keyboardData[i]);
+        let current = new Key(keyboardData[i], lang);
         current.render();
         keyArr.push(current)
     }
@@ -467,7 +509,44 @@ body.addEventListener("keydown", (e) => {
     textField.focus();
     let code = "." + e.code;
     let key_pres = document.querySelector(code);
-    key_pres.classList.add("key-item_pres");
+    if(key_pres){
+        key_pres.classList.add("key-item_pres");
+    }
+    if(e.code === "AltLeft" && e.ctrlKey === true){
+        keyboard.innerHTML = "";
+        lang == "en" ? lang = "ru" : lang = "en";
+        for(let i = 0; i < keyArr.length; i++){
+            keyArr[i].setValue("lang", lang)
+            keyArr[i].render();
+        }
+        localStorage.setItem("lang", lang)
+    }
+    if(e.code == "ShiftLeft" || e.code == "ShiftRight"){
+        keyboard.innerHTML = "";
+        let val = keyArr[0].shift;
+        for(let i = 0; i < keyArr.length; i++){
+            val === "true" ? keyArr[i].setValue("shift", "false") : keyArr[i].setValue("shift", "true");
+            keyArr[i].render();
+        }
+    }
+    if(e.code == "CapsLock"){
+        keyboard.innerHTML = "";
+        let val = keyArr[0].caps;
+        for(let i = 0; i < keyArr.length; i++){
+            val === "true" ? keyArr[i].setValue("caps", "false") : keyArr[i].setValue("caps", "true");
+            keyArr[i].render();
+        }
+    }
+    if(e.code == "Tab"){
+        e.preventDefault();
+        let caretPos = textField.selectionStart;
+        let value = textField.value;
+        textField.value = value.substring(0, caretPos) + "\t" + value.substring(textField.selectionEnd);
+        textField.selectionStart = textField.selectionEnd = caretPos + 1;
+    }
+
+
+
 
     // if(e.code == "ShiftLeft" || e.code == "ShiftRight"){
     //     Key.shift = true;
@@ -477,7 +556,11 @@ body.addEventListener("keydown", (e) => {
 });
 
 body.addEventListener("keyup", (e) => {
-    document.querySelector(".key-item_pres").classList.remove("key-item_pres");
+    let key_pres = document.querySelector(".key-item_pres")
+    if(key_pres){
+        key_pres.classList.remove("key-item_pres");
+    }
+
     // Key.pro.shift = false;
     // keyboard.classList.remove("upper-active")
 });
